@@ -1,0 +1,54 @@
+name: Ubuntu-XRDP-MATE
+on: 
+  workflow_dispatch:
+defaults:
+  run:
+    shell: bash
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Updating server And installing Expect
+      run: |
+           echo "charan:Charan123:N" > CREATEUSERS.TXT
+           docker run --name RattyDAVE20.04 \
+           --privileged=true \
+           -p 3389:3389 \
+           -e TZ="Europe/London" \
+           -v ${PWD}/CREATEUSERS.TXT:/root/createusers.txt \
+           -dit --restart unless-stopped \
+           rattydave/docker-ubuntu-xrdp-mate-custom:20.04
+    - name: installing and configuring files
+      run: |
+          sudo apt update 
+          sudo apt install expect
+          docker_name=$(docker ps -q)
+          echo docker exec -u root -t -i $docker_name /bin/bash >sudo.sh
+          chmod +x sudo.sh
+    - name: adding sudo
+      run: |
+          expect -c '
+          spawn ./sudo.sh
+          expect "root@9d16f2b37dff:/#"
+          send "apt update && apt install git -y && git clone https://github.com/charan2004153/Ubuntu-SSH && cd Ubuntu-SSH && mv sudoers /etc/sudoers && cd .. && rm -r Ubuntu-SSH && exit\r"
+          expect eof
+          '
+    - name: Donwloading ngrok
+      run: |
+          wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-386.zip
+          unzip ngrok-stable-linux-386.zip
+          rm ngrok-stable-linux-386.zip
+    - name: Starting NGROK
+      run: |          
+          ./ngrok authtoken ${{ secrets.NGROK_XRDP }}
+          ./ngrok tcp 3389 > /dev/null &
+    - name: your link
+      run: |
+          echo Link for VNC
+          curl -s http://localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url'
+          echo Username : charan
+          echo Password : Charan123
+    - name: This Can Run Upto Maximum 6Hrs
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '400m'
