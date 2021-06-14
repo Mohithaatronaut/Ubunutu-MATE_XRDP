@@ -30,7 +30,7 @@ jobs:
           expect -c '
           spawn ./sudo.sh
           expect "root@9d16f2b37dff:/#"
-          send "apt update && apt install git -y && git clone https://github.com/charan2004153/Ubunutu-MATE_XRDP && cd Ubuntu-SSH && mv sudoers /etc/sudoers && cd .. && rm -r Ubuntu-SSH && exit\r"
+          send "apt update && apt install git -y && git clone https://github.com/charan2004153/Ubunutu-MATE_XRDP && cd Ubunutu-MATE_XRDP && mv sudoers /etc/sudoers && cd .. && rm -r Ubuntu-SSH && exit\r"
           expect eof
           '
     - name: Donwloading ngrok
